@@ -34,7 +34,7 @@ class Login extends Component {
           
           storageUtils.saveUser(user) // 保存到localStorage中去
           // 跳转到后台管理界面（登录后，不需要再回跳回登录界面了,所以不用push()方法来跳转路由，而是用replace方法来跳转路由）
-          this.props.history.replace('/')
+          this.props.history.replace('/home')
         } else { // 登录失败
           // 提示登录失败信息
           message.error(result.msg)

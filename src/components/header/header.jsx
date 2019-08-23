@@ -4,10 +4,11 @@ import { reqWeather } from '../../api'
 import formateDate from '../../utils/formateDate'
 import memoryUtils from '../../utils/memoryUtils'
 import { withRouter } from 'react-router-dom'
-import menuList from '../../config/menuConfig'
+// import menuList from '../../config/menuConfig'
 import { Modal, message } from 'antd'
 import storageUtils from '../../utils/storageUtils'
 import LinkButton from '../link-button'
+import { connect } from 'react-redux'
 
 const { confirm } = Modal;
 
@@ -34,6 +35,7 @@ class Header extends Component {
     this.setState({ dayPictureUrl, weather })
   }
 
+  /*
   getTitle = () => {
     // 得到当前请求路径
     const path = this.props.location.pathname
@@ -51,14 +53,16 @@ class Header extends Component {
     })
     return title
   }
+  */
+  
 
   // 退出登录
   logOut = () => {
     //显示确认框
     confirm({
       content: '确定退出吗?',
-      okText:'确定',
-      cancelText:'取消',
+      okText: '确定',
+      cancelText: '取消',
       onOk: () => { // 注意这里的this指向,最好改成箭头函数
         // console.log('ok',this)
         // 删除localStorage和memoryUtils.user中的用户信息
@@ -87,7 +91,7 @@ class Header extends Component {
   render() {
     const { currentTime, dayPictureUrl, weather } = this.state
     const { username } = memoryUtils.user
-    const title = this.getTitle()
+    const title = this.props.headTitle
     return (
       <div className='header'>
         <div className='header'>
@@ -108,4 +112,6 @@ class Header extends Component {
     )
   }
 }
-export default withRouter(Header)
+export default connect(
+  state=>({headTitle:state.headTitle})
+)(withRouter(Header))

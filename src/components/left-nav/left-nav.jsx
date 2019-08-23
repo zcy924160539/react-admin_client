@@ -5,55 +5,10 @@ import logo from '../../assets/images/logo.png'
 import menuList from '../../config/menuConfig'
 import memoryUtils from '../../utils/memoryUtils'
 import { Menu, Icon } from 'antd'
+import { connect } from 'react-redux'
+import { setHeadTitle } from '../../redux/actions'
 const { SubMenu } = Menu;
 class LeftNav extends Component {
-  /*
-    根据menu的数据数组，生成对应的标签数组
-    使用map() + 递归调用
-  */
-  // getMenuNodes_map = (menuList) => {
-  //   return menuList.map(item => {
-  //     if (!item.children) {
-  //       return (
-  //         <Menu.Item key={item.key}>
-  //           <Link to={item.key}>
-  //             <Icon type={item.icon} />
-  //             <span>{item.title}</span>
-  //           </Link>
-  //         </Menu.Item>
-  //       )
-  //     } else {
-  //       return (
-  //         <SubMenu
-  //           key={item.key}
-  //           title={
-  //             <span>
-  //               <Icon type={item.icon} />
-  //               <span>{item.title}</span>
-  //             </span>
-  //           }
-  //         >
-  //           {/* {
-  //             item.children.map(item => {
-  //               return (
-  //                 <Menu.Item key={item.key}>
-  //                   <Link to={item.key}>
-  //                     <Icon type={item.icon} />
-  //                     <span>{item.title}</span>
-  //                   </Link>
-  //                 </Menu.Item>
-  //               )
-  //             })
-  //           } */}
-
-  //           {/* 递归调用 */
-  //             this.getMenuNodes(item.children)
-  //           }
-  //         </SubMenu>
-  //       )
-  //     }
-  //   })
-  // }
 
   /*
   当前登录用户对item是否有权限
@@ -71,8 +26,8 @@ class LeftNav extends Component {
      */
     if (username === 'admin' || isPublic || menus.indexOf(key) !== -1) {
       return true
-    }else if(item.children){ // 4. 如果当前用户有此item的某个item权限
-      return !!item.children.find(child=>menus.indexOf(child.key)!==-1)
+    } else if (item.children) { // 4. 如果当前用户有此item的某个item权限
+      return !!item.children.find(child => menus.indexOf(child.key) !== -1)
     }
   }
 
@@ -83,39 +38,42 @@ class LeftNav extends Component {
     return menuList.reduce((pre, item) => {
       // 如果当前用户有item对应的权限,才需要显示对应的菜单项
       if (this.hasAuth(item)) {
-        if (!item.children) {
-          // 向pre中添加<Menu.Item>
-          pre.push((
-            <Menu.Item key={item.key}>
-              <Link to={item.key}>
-                <Icon type={item.icon} />
-                <span>{item.title}</span>
-              </Link>
-            </Menu.Item>
-          ))
-        } else {
-          // 查找一个与当前请求路径匹配的子Item
-          const cItem = item.children.find(cItem => path.indexOf(cItem.key) === 0) // 判断cItem.key是不是以/product开头
-          // 如果存在，说明当前item的子列表需要打开
-          if (cItem) this.openKey = item.key
-
-          // 向pre中添加<SubMenu.Item>
-          pre.push((
-            <SubMenu
-              key={item.key}
-              title={
-                <span>
+        if (item.key === path || path.indexOf(item.key) === 0){
+          this.props.setHeadTitle(item.title)
+        }
+          if (!item.children) {
+            // 向pre中添加<Menu.Item>
+            pre.push((
+              <Menu.Item key={item.key}>
+                <Link to={item.key} onClick={() => this.props.setHeadTitle(item.title)}>
                   <Icon type={item.icon} />
                   <span>{item.title}</span>
-                </span>
-              }
-            >
-              {/* 递归调用 */
-                this.getMenuNodes(item.children)
-              }
-            </SubMenu>
-          ))
-        }
+                </Link>
+              </Menu.Item>
+            ))
+          } else {
+            // 查找一个与当前请求路径匹配的子Item
+            const cItem = item.children.find(cItem => path.indexOf(cItem.key) === 0) // 判断cItem.key是不是以/product开头
+            // 如果存在，说明当前item的子列表需要打开
+            if (cItem) this.openKey = item.key
+
+            // 向pre中添加<SubMenu.Item>
+            pre.push((
+              <SubMenu
+                key={item.key}
+                title={
+                  <span>
+                    <Icon type={item.icon} />
+                    <span>{item.title}</span>
+                  </span>
+                }
+              >
+                {/* 递归调用 */
+                  this.getMenuNodes(item.children)
+                }
+              </SubMenu>
+            ))
+          }
       }
       return pre
     }, [])
@@ -152,5 +110,7 @@ class LeftNav extends Component {
     )
   }
 }
-// withRouter高阶组件,包装LeftNav,给LeftNav传递路由的属性
-export default withRouter(LeftNav)
+export default connect(
+  state => ({ headTitle: state.headTitle }),
+  { setHeadTitle }
+)(withRouter(LeftNav))
