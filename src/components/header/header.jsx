@@ -6,7 +6,7 @@ import memoryUtils from '../../utils/memoryUtils'
 import { withRouter } from 'react-router-dom'
 import menuList from '../../config/menuConfig'
 import { Modal, message } from 'antd'
-import storeUtils from '../../utils/storeUtils'
+import storageUtils from '../../utils/storageUtils'
 import LinkButton from '../link-button'
 
 const { confirm } = Modal;
@@ -62,7 +62,7 @@ class Header extends Component {
       onOk: () => { // 注意这里的this指向,最好改成箭头函数
         // console.log('ok',this)
         // 删除localStorage和memoryUtils.user中的用户信息
-        storeUtils.removeUser()
+        storageUtils.removeUser()
         memoryUtils.user = {}
         // 跳转到登录页面
         this.props.history.replace('/login')
