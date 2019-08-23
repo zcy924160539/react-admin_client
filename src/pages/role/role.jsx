@@ -5,7 +5,7 @@ import { reqRoles, reqAddRole, reqUpdateRole } from '../../api'
 import AddForm from './add-form'
 import AuthForm from './auth-form'
 import memoryUtils from '../../utils/memoryUtils'
-import storeUtils from '../../utils/storeUtils'
+import storageUtils from '../../utils/storageUtils'
 import formateDate from '../../utils/formateDate'
 
 /**
@@ -115,7 +115,7 @@ export default class Role extends Component {
       // 如果当前更新的是自己角色的权限，强制退出
       if (role._id === memoryUtils.user.role_id) {
         memoryUtils.user = {}
-        storeUtils.removeUser()
+        storageUtils.removeUser()
         this.props.history.replace('/login')
         message.success('当前用户角色权限已修改，请重新登录')
       } else {

@@ -5,7 +5,7 @@ import logo from '../../assets/images/logo.png'
 import { Form, Icon, Input, Button, message } from 'antd';
 import { reqLogin } from '../../api'
 import memoryUtils from '../../utils/memoryUtils'
-import storeUtils from '../../utils/storeUtils'
+import storageUtils from '../../utils/storageUtils'
 // const Item = Form.Item // 不能写在import之前
 
 /* 
@@ -32,7 +32,7 @@ class Login extends Component {
 
           memoryUtils.user = user // 保存在内存里面
           
-          storeUtils.saveUser(user) // 保存到localStorage中去
+          storageUtils.saveUser(user) // 保存到localStorage中去
           // 跳转到后台管理界面（登录后，不需要再回跳回登录界面了,所以不用push()方法来跳转路由，而是用replace方法来跳转路由）
           this.props.history.replace('/')
         } else { // 登录失败
