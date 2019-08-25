@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
-import {Redirect} from 'react-router-dom'
+import { Redirect } from 'react-router-dom'
 import './login.less'
 import logo from '../../assets/images/logo.png'
-import { Form, Icon, Input, Button, message } from 'antd';
-import { reqLogin } from '../../api'
-import memoryUtils from '../../utils/memoryUtils'
-import storageUtils from '../../utils/storageUtils'
+import { Form, Icon, Input, Button } from 'antd';
+import { connect } from 'react-redux'
+import { login } from '../../redux/actions'
 // const Item = Form.Item // 不能写在import之前
 
 /* 
@@ -22,23 +21,25 @@ class Login extends Component {
       if (!error) {
         // 提交登录的ajax请求(post请求)
         const { username, password } = values
-        const result = await reqLogin(username, password)
-        if (result.status === 0) {// 登陆成功
-          // 提示登陆成功信息
-          message.success('登陆成功',.7)
+        // const result = await reqLogin(username, password)
+        // if (result.status === 0) {// 登陆成功
+        //   // 提示登陆成功信息
+        //   message.success('登陆成功',.7)
 
-          // 保存user
-          const user = result.data
+        //   // 保存user
+        //   const user = result.data
 
-          memoryUtils.user = user // 保存在内存里面
-          
-          storageUtils.saveUser(user) // 保存到localStorage中去
-          // 跳转到后台管理界面（登录后，不需要再回跳回登录界面了,所以不用push()方法来跳转路由，而是用replace方法来跳转路由）
-          this.props.history.replace('/home')
-        } else { // 登录失败
-          // 提示登录失败信息
-          message.error(result.msg)
-        }
+        //   memoryUtils.user = user // 保存在内存里面
+
+        //   storageUtils.saveUser(user) // 保存到localStorage中去
+        //   // 跳转到后台管理界面（登录后，不需要再回跳回登录界面了,所以不用push()方法来跳转路由，而是用replace方法来跳转路由）
+        //   this.props.history.replace('/home')
+        // } else { // 登录失败
+        //   // 提示登录失败信息
+        //   message.error(result.msg)
+        // }
+        // 调用分发异步action的函数 => 发登录的请求，有结果后更新状态
+        this.props.login(username, password)
       } else {
         console.error('校验失败')
       }
@@ -89,11 +90,13 @@ class Login extends Component {
   }
 
   render() {
-    const {user} = memoryUtils
+    const user = this.props.user
     // 如果用户已经登录，自动跳转到管理界面
-    if(user && user._id){
-      return <Redirect to='/' />
+    if (user && user._id) {
+      return <Redirect to='/home' />
     }
+
+    const errorMsg = this.props.user.errorMsg
 
     // 得到form对象(form有获取数据和表单验证的功能)
     const form = this.props.form
@@ -105,6 +108,7 @@ class Login extends Component {
           <h1>React项目: 后台管理系统</h1>
         </header>
         <section className='login-content'>
+          <div className={user.errorMsg?'error-msg show':'error-msg'}>{errorMsg}</div>
           <h2>用户登录</h2>
           <Form onSubmit={this.handleSubmit} className="login-form">
             <Form.Item>
@@ -173,7 +177,10 @@ Login是被包装的组件，是WrapLogin的子组件，WrapLogin会向Login传�
 新组件会想Form传递一个强大的对象属性：form
 */
 const WrapLogin = Form.create()(Login)
-export default WrapLogin
+export default connect(
+  state => ({ user: state.user }),
+  { login }
+)(WrapLogin)
 
 /*
 1.前台表单认证

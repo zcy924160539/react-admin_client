@@ -3,18 +3,20 @@ import { Card, Icon, List, } from 'antd'
 import LinkButton from '../../components/link-button'
 import { BASE_IMG_URL } from '../../utils/constants'
 import { reqCategory } from '../../api'
-
+// import memoryUtils from '../../utils/memoryUtils'
+import {connect} from 'react-redux'
+import {addProduct} from '../../redux/actions'
 
 const { Item } = List
 
-export default class ProductDetail extends Component {
+class ProductDetail extends Component {
   state = {
     cName1: '',// 一级分类名称
     cName2: '' // 二级分类名称
   }
 
   async componentDidMount() {
-    const { pCategoryId, categoryId } = this.props.location.state.product
+    const { pCategoryId, categoryId } = this.props.product //this.props.location.state.product
     if (pCategoryId === 0) {// 一级分类下的商品
       const result = await reqCategory(categoryId)
       if (result.status === 0) {
@@ -36,9 +38,18 @@ export default class ProductDetail extends Component {
       this.setState({ cName1, cName2 })
     }
   }
+
+  /*
+  在组件卸载之前清除保存的数据,以防点击添加商品时会有数据
+  */
+  componentWillUnmount() {
+    // 组件卸载时，分发action，把product清空
+    this.props.addProduct({})
+  }
+
   render() {
     // 读取携带过来的state数据
-    const { name, desc, price, detail, imgs } = this.props.location.state.product
+    const { name, desc, price, detail, imgs } = this.props.product
     const { cName1, cName2 } = this.state
     const title = (
       <span>
@@ -88,3 +99,8 @@ export default class ProductDetail extends Component {
     )
   }
 }
+
+export default connect(
+  state=>({product:state.product}),
+  {addProduct}
+)(ProductDetail)

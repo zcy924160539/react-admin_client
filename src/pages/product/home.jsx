@@ -3,10 +3,13 @@ import { Card, Select, Input, Button, Icon, Table, message } from 'antd'
 import LinkButton from '../../components/link-button'
 import { reqProducts, reqSearchProducts, reqUpdateStatus } from '../../api'
 import { PAGE_SIZE } from '../../utils/constants'
+// import memoryUtils from '../../utils/memoryUtils'
+import { connect } from 'react-redux'
+import { addProduct } from '../../redux/actions'
 
 const { Option } = Select
 
-export default class ProductHome extends Component {
+class ProductHome extends Component {
   state = {// 商品的数组
     total: 0,
     products: [],
@@ -56,13 +59,34 @@ export default class ProductHome extends Component {
         render: (product) => {
           return (
             <span>
-              <LinkButton onClick={() => this.props.history.push('/product/detail', { product })}>详情</LinkButton>
-              <LinkButton onClick={() => this.props.history.push('/product/addupdate', product)}>修改</LinkButton>
+              <LinkButton onClick={() => this.showDetail(product)}>详情</LinkButton>
+              <LinkButton onClick={() => this.showUpdate(product)}>修改</LinkButton>
             </span>
           )
         }
       },
     ]
+  }
+
+
+  /*
+  显示商品详情界面
+  */
+  showDetail = (product) => {
+    // 缓存product对象给detail组件使用
+    // memoryUtils.product = product
+    this.props.addProduct(product) // 分发action，把product写入store中
+    this.props.history.push('/product/detail') // 跳转到商品详情页
+  }
+
+
+  /*
+  显示修改商品界面
+  */
+  showUpdate = (product) => {
+    // memoryUtils.product = product // 把product对象存入memoryUtils模块
+    this.props.addProduct(product) // 把product对象存入redux
+    this.props.history.push('/product/addupdate') //跳转到商品修改页
   }
 
   // 获取指定页码的列表数据显示
@@ -132,7 +156,7 @@ export default class ProductHome extends Component {
           loading={loading}
           pagination={
             {
-              current:this.pageNum,
+              current: this.pageNum,
               total,//总数
               defaultPageSize: PAGE_SIZE,//一页显示多少条信息的常量
               showQuickJumper: true,//根据输入页码跳转到第几页
@@ -144,3 +168,8 @@ export default class ProductHome extends Component {
     )
   }
 }
+
+export default connect(
+  state => ({ product: state.product }),
+  { addProduct }
+)(ProductHome)

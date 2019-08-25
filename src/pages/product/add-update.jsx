@@ -4,6 +4,9 @@ import LinkButton from '../../components/link-button'
 import { reqCategorys, reqAddOrUpdateProduct } from '../../api'
 import PicturesWall from './pictures-wall'
 import RichTextEditor from './rich-text-editor'
+// import memoryUtils from '../../utils/memoryUtils'
+import { connect } from 'react-redux'
+import { addProduct } from '../../redux/actions'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -85,7 +88,7 @@ class ProductAppUpdate extends Component {
         const imgs = this.pw.current.getImgs() // 得到图片数组数据
         const detail = this.editor.current.getDetail() // 得到富文本编辑器的输入信息
 
-        const product = { name, desc, price, imgs, detail,pCategoryId, categoryId }
+        const product = { name, desc, price, imgs, detail, pCategoryId, categoryId }
 
         // 如果是更新，需要添加 _id 
         if (this.isUpdate) {
@@ -97,10 +100,10 @@ class ProductAppUpdate extends Component {
 
         // 3.根据结果提示
         if (result.status === 0) {
-          message.success(`${this.isUpdate?'更新商品成功':'添加商品成功'}`)
+          message.success(`${this.isUpdate ? '更新商品成功' : '添加商品成功'}`)
           this.props.history.goBack()
         } else {
-          message.error(`${this.isUpdate?'更新商品失败':'添加商品失败'}`)
+          message.error(`${this.isUpdate ? '更新商品失败' : '添加商品失败'}`)
         }
 
       }
@@ -150,9 +153,9 @@ class ProductAppUpdate extends Component {
 
   componentWillMount() {
     // 取出携带的state
-    const product = this.props.location.state // 如果是添加没值，否则有值
+    const { product } = this.props // 如果是添加没值，否则有值
     // 保存是否是更新的标识
-    this.isUpdate = !!product
+    this.isUpdate = !!product._id
     // 保存商品(如果没有，保存的是空对象，防止报错)
     this.product = product || {}
     // console.log(this.product)
@@ -161,6 +164,16 @@ class ProductAppUpdate extends Component {
   componentDidMount() {
     this.getCategorys('0')
   }
+
+
+  /*
+  在组件卸载之前清除保存的数据,以防点击添加商品时会有数据
+  */
+  componentWillUnmount() {
+    // 组件卸载时，分发action，把product清空
+    this.props.addProduct({})
+  }
+
   render() {
     const { isUpdate, product } = this
     const { categoryId, pCategoryId, imgs, detail } = product
@@ -257,5 +270,8 @@ class ProductAppUpdate extends Component {
   }
 }
 
-export default Form.create()(ProductAppUpdate)
+export default connect(
+  state => ({ product: state.product }),
+  { addProduct }
+)(Form.create()(ProductAppUpdate))
 

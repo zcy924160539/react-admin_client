@@ -2,13 +2,11 @@ import React, { Component } from 'react'
 import './index.less'
 import { reqWeather } from '../../api'
 import formateDate from '../../utils/formateDate'
-import memoryUtils from '../../utils/memoryUtils'
 import { withRouter } from 'react-router-dom'
-// import menuList from '../../config/menuConfig'
-import { Modal, message } from 'antd'
-import storageUtils from '../../utils/storageUtils'
+import { Modal } from 'antd'
 import LinkButton from '../link-button'
 import { connect } from 'react-redux'
+import { logout } from '../../redux/actions'
 
 const { confirm } = Modal;
 
@@ -54,7 +52,7 @@ class Header extends Component {
     return title
   }
   */
-  
+
 
   // 退出登录
   logOut = () => {
@@ -64,13 +62,7 @@ class Header extends Component {
       okText: '确定',
       cancelText: '取消',
       onOk: () => { // 注意这里的this指向,最好改成箭头函数
-        // console.log('ok',this)
-        // 删除localStorage和memoryUtils.user中的用户信息
-        storageUtils.removeUser()
-        memoryUtils.user = {}
-        // 跳转到登录页面
-        this.props.history.replace('/login')
-        message.success('已退出', .7)
+        this.props.logout()
       }
     });
   }
@@ -90,7 +82,7 @@ class Header extends Component {
   }
   render() {
     const { currentTime, dayPictureUrl, weather } = this.state
-    const { username } = memoryUtils.user
+    const { username } = this.props.user
     const title = this.props.headTitle
     return (
       <div className='header'>
@@ -113,5 +105,6 @@ class Header extends Component {
   }
 }
 export default connect(
-  state=>({headTitle:state.headTitle})
+  state => ({ headTitle: state.headTitle, user: state.user }),
+  { logout }
 )(withRouter(Header))
