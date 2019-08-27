@@ -53,7 +53,7 @@ class Admin extends Component {
               <Route component={NotFound}/>
             </Switch>
           </Content>
-          <Footer style={{ textAlign: 'center', color: '#aaa' }}>Footer</Footer>
+          <Footer style={{ textAlign: 'center', color: '#aaa' }}>react 后台项目</Footer>
         </Layout>
       </Layout>
     )
