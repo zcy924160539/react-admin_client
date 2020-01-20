@@ -9,4 +9,4 @@ export default function formateDate(time) {
   const [year, month, day, hours, minutes, seconds] = timeArr.map(time => formate(time))
   // 返回一个格式为 YYYY-MM-DD hh-mm-ss 的时间字符串
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
-}Y
+}
